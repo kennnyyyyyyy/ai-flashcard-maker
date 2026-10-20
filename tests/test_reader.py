@@ -15,9 +15,22 @@ def test_reads_a_markdown_file(tmp_path):
     assert "Lidar" in read_document(notes)
 
 
+def test_reads_a_word_document(tmp_path):
+    from docx import Document
+
+    doc = Document()
+    doc.add_heading("Actuators", level=1)
+    doc.add_paragraph("A servo motor turns to a set angle.")
+    doc.add_paragraph("")
+    doc.add_paragraph("A stepper motor moves in fixed steps.")
+    path = tmp_path / "lecture.docx"
+    doc.save(path)
+    assert read_document(path) == "Actuators\n\nA servo motor turns to a set angle.\n\nA stepper motor moves in fixed steps."
+
+
 def test_rejects_unsupported_files(tmp_path):
-    with pytest.raises(UnsupportedFileError, match=".docx"):
-        read_document(tmp_path / "notes.docx")
+    with pytest.raises(UnsupportedFileError, match=".pptx"):
+        read_document(tmp_path / "slides.pptx")
 
 
 def test_short_text_stays_in_one_chunk():

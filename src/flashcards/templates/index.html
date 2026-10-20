@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI Flashcard Maker</title>
+  <link rel="icon" href="{{ url_for('static', filename='logo.png') }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="backdrop" aria-hidden="true"></div>
+  <div class="stickers" aria-hidden="true">
+    {% for name, side, top, offset, tilt in [("hamster", "left", 13, 5, -8), ("monster", "left", 45, 2.5, 7), ("pig", "left", 75, 6, -5),
+                                             ("cat", "right", 12, 5, 8), ("bear", "right", 44, 2.5, -7), ("bunny", "right", 74, 6, 5)] %}
+    <img class="sticker" src="{{ url_for('static', filename='stickers/' ~ name ~ '.png') }}" alt=""
+         style="top: {{ top }}vh; {{ side }}: {{ offset }}vw; --tilt: {{ tilt }}deg; --delay: -{{ loop.index * 0.7 }}s">
+    {% endfor %}
+  </div>
+
+  <header class="top">
+    <a class="brand" href="/">
+      <img src="{{ url_for('static', filename='logo.png') }}" alt="" width="40" height="40">
+      <span>AI Flashcard Maker</span>
+    </a>
+    <span class="pill"><span class="dot"></span>GPT-4o-mini</span>
+  </header>
+
+  <main>
+    <section class="hero">
+      <span class="tag"><img src="{{ url_for('static', filename='stickers/hamster.png') }}" alt="">Made for last-minute revision. No judgement.</span>
+      <h1>Turn your notes into <span class="accent">flashcards</span></h1>
+      <p>Paste text or upload a PDF, Word or text file. GPT-4o-mini picks out the things you'd be tested on.</p>
+    </section>
+
+    <form class="panel" id="form" novalidate>
+      <img class="peek" src="{{ url_for('static', filename='stickers/blob.png') }}" alt="" aria-hidden="true">
+      <div class="tabs" role="tablist">
+        <button type="button" role="tab" class="tab active" data-tab="text" aria-selected="true">
+          <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Paste text
+        </button>
+        <button type="button" role="tab" class="tab" data-tab="file" aria-selected="false">
+          <svg viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>Upload a document
+        </button>
+        <span class="glider" aria-hidden="true"></span>
+      </div>
+
+      <div class="pane" id="pane-text">
+        <textarea id="text" name="text" placeholder="Paste your lecture notes here..." spellcheck="false"></textarea>
+        <div class="meta"><span id="words">0 words</span></div>
+      </div>
+
+      <div class="pane" id="pane-file" hidden>
+        <label class="drop" id="drop">
+          <input type="file" id="file" name="file" accept="{{ accept }}" hidden>
+          <span class="drop-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
+          </span>
+          <strong>Drop a file here or <u>browse</u></strong>
+          <small>PDF, Word (.docx), .txt or .md, up to {{ max_mb }} MB</small>
+        </label>
+        <div class="chip" id="chip" hidden>
+          <span class="chip-icon" id="chip-icon">PDF</span>
+          <span class="chip-text"><strong id="chip-name"></strong><small id="chip-size"></small></span>
+          <button type="button" class="chip-x" id="chip-x" aria-label="Remove file">&times;</button>
+        </div>
+      </div>
+
+      <div class="controls">
+        <label class="range">
+          <span>Cards</span>
+          <input type="range" id="count" name="count" min="{{ min_cards }}" max="{{ max_cards }}" value="{{ default_cards }}">
+          <output id="count-out">{{ default_cards }}</output>
+        </label>
+        <button type="submit" class="primary" id="go">
+          <svg class="spark" viewBox="0 0 24 24"><path d="M12 2l1.8 6.2L20 10l-6.2 1.8L12 18l-1.8-6.2L4 10l6.2-1.8z"/></svg>
+          <span class="spinner" aria-hidden="true"></span>
+          <span id="go-label">Make flashcards</span>
+        </button>
+      </div>
+      <p class="error" id="error" role="alert" hidden></p>
+    </form>
+
+    <section class="results" id="results" hidden>
+      <div class="results-head">
+        <img class="reaction" id="reaction" src="{{ url_for('static', filename='stickers/frog.png') }}" alt="" aria-hidden="true">
+        <div class="results-text">
+          <h2 id="results-title">Your flashcards</h2>
+          <p id="results-sub"></p>
+        </div>
+        <div class="actions">
+          <button type="button" class="ghost" id="flip-all">Flip all</button>
+          <button type="button" class="secondary" data-export="csv">
+            <svg viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>CSV for Anki
+          </button>
+          <button type="button" class="secondary" data-export="md">
+            <svg viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>Markdown
+          </button>
+        </div>
+      </div>
+      <div class="grid" id="grid"></div>
+    </section>
+  </main>
+
+  <footer>Your OpenAI key stays on this computer in <code>.env</code>. Nothing is stored.</footer>
+
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
