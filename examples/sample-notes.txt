@@ -1,0 +1,11 @@
+Introduction to Robot Sensing and Control
+
+A robot senses the world through sensors and acts on it through actuators. Sensors turn physical quantities such as distance, light or rotation into signals a computer can read. Actuators, such as DC motors and servos, turn electrical signals back into movement.
+
+Ultrasonic sensors measure distance by sending a pulse of sound and timing how long the echo takes to return. Because the sound travels to the object and back, the distance is half of the speed of sound multiplied by the echo time. Lidar works the same way but uses laser light, which makes it far more precise.
+
+An encoder is attached to a motor shaft and counts how far the shaft has turned. Counting encoder ticks over time gives the wheel's speed, which lets the robot estimate how far it has travelled. This estimate is called odometry, and its error grows the further the robot goes.
+
+A PID controller keeps a value, such as wheel speed, close to a target. The proportional term reacts to the current error, the integral term removes steady error that builds up over time, and the derivative term reacts to how quickly the error is changing, which reduces overshoot.
+
+Path planning finds a route from a start point to a goal. The A* algorithm searches a grid of cells and always expands the cell with the lowest estimated total cost, which is the distance travelled so far plus a heuristic guess of the distance left. If the heuristic never overestimates, A* is guaranteed to find the shortest path.
