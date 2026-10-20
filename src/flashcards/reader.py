@@ -1,4 +1,4 @@
-"""Reads text out of .txt, .md and .pdf files and splits it into chunks.
+"""Reads text out of .txt, .md, .pdf and .docx files and splits it into chunks.
 
 Long documents are split into chunks so each request to the model stays a
 sensible size. Chunks break between paragraphs, never mid-sentence.
@@ -6,7 +6,7 @@ sensible size. Chunks break between paragraphs, never mid-sentence.
 
 from pathlib import Path
 
-SUPPORTED = {".txt", ".md", ".pdf"}
+SUPPORTED = {".txt", ".md", ".pdf", ".docx"}
 
 
 class UnsupportedFileError(ValueError):
@@ -25,6 +25,11 @@ def read_document(path):
 
         pages = [page.extract_text() or "" for page in PdfReader(path).pages]
         return "\n\n".join(pages).strip()
+    if suffix == ".docx":
+        from docx import Document
+
+        paragraphs = [p.text.strip() for p in Document(path).paragraphs]
+        return "\n\n".join(p for p in paragraphs if p).strip()
     return path.read_text(encoding="utf-8").strip()
 
 
