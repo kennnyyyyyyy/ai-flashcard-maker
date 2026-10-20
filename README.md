@@ -3,9 +3,10 @@
 Applied Robotics and AI Project, University of Hertfordshire (PSB Academy)
 Kenzo Ji
 
-A small command-line tool that turns lecture notes into study flashcards. You give it a
-`.txt`, `.md` or `.pdf` file, it asks GPT-4o-mini to pull out the key facts as questions
-and answers, and saves them as a CSV you can import into Anki or Quizlet.
+A small tool that turns lecture notes into study flashcards. You give it a `.txt`, `.md`,
+`.pdf` or Word (`.docx`) file, or paste text into the web page, it asks GPT-4o-mini to pull
+out the key facts as questions and answers, and saves them as a CSV you can import into
+Anki or Quizlet. It runs from the terminal or as a small web page.
 
 Project board: https://trello.com/b/lzUqMxdc
 
@@ -27,9 +28,24 @@ Reading examples/sample-notes.txt and asking gpt-4o-mini for up to 3 cards...
 Saved 3 cards to examples/sample-notes-flashcards.csv and examples/sample-notes-flashcards.md
 ```
 
+## Web interface
+
+There is also a small web page, so you don't have to use the terminal:
+
+```
+python src/web.py
+```
+
+Then open http://127.0.0.1:5000. Paste text or upload a PDF, Word, `.txt` or `.md` file,
+pick how many cards you want and click Make flashcards. Click a card to flip it, and
+download the cards as CSV (for Anki or Quizlet) or Markdown. The page reads the key from
+the same `.env` file as the command-line tool, so the key never reaches the browser.
+
+![The web interface](docs/images/web-interface.png)
+
 ## How it works
 
-1. `reader.py` reads the document. PDFs are read page by page.
+1. `reader.py` reads the document. PDFs are read page by page, Word files paragraph by paragraph.
 2. Long text is split into chunks between paragraphs, so each request stays a sensible size.
 3. `generator.py` sends each chunk to GPT-4o-mini and asks for the cards back as JSON.
 4. Incomplete cards are skipped and duplicate questions are removed.
@@ -65,8 +81,10 @@ client, so GitHub Actions can run them without a key.
 
 ```
 src/main.py                    command-line tool
+src/web.py                     starts the web page
+src/flashcards/web.py          the web page (Flask), with templates/ and static/
 src/flashcards/config.py       loads the API key and model from .env
-src/flashcards/reader.py       reads .txt, .md and .pdf files
+src/flashcards/reader.py       reads .txt, .md, .pdf and .docx files
 src/flashcards/generator.py    asks GPT-4o-mini for flashcards
 src/flashcards/exporter.py     saves CSV and Markdown
 tests/                         unit tests
@@ -130,7 +148,6 @@ and to Done when it is merged, and leaves a comment with the link.
 - Export straight to an Anki deck
 - A quiz mode with spaced repetition
 - Show token usage and cost per run
-- A simple web page for uploading files
 
 ## License
 
