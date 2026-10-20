@@ -218,3 +218,7 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Flashcards made by the tool
+*-flashcards.csv
+*-flashcards.md
