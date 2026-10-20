@@ -88,8 +88,7 @@ src/flashcards/reader.py       reads .txt, .md, .pdf and .docx files
 src/flashcards/generator.py    asks GPT-4o-mini for flashcards
 src/flashcards/exporter.py     saves CSV and Markdown
 tests/                         unit tests
-docs/git-add-commit-push.md    notes on add, commit and push
-docs/assignment-1-report.md    Assignment 1 report with screenshots (also as PDF)
+docs/Assignment-1-Report.pdf  Assignment 1 report: add, commit, push and clone
 .github/workflows/             tests and Trello sync on every pull request
 ```
 
@@ -106,10 +105,7 @@ edit files  --git add-->  staging area  --git commit-->  local history  --git pu
 - `git push` uploads my commits to GitHub so they are backed up and visible.
 - `git clone` downloads the whole repository once; `git pull` fetches new commits.
 
-More detail is in [docs/git-add-commit-push.md](docs/git-add-commit-push.md).
-
-The full Assignment 1 report, with screenshots of every step, is in
-[docs/assignment-1-report.md](docs/assignment-1-report.md) ([PDF](docs/Assignment-1-Report.pdf)).
+More detail is in my [Assignment 1 report](docs/Assignment-1-Report.pdf).
 
 ## Branching strategy
 
