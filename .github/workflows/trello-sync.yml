@@ -1,0 +1,19 @@
+name: Trello sync
+
+on:
+  pull_request:
+    types: [opened, reopened, closed]
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Move the linked Trello card
+        env:
+          TRELLO_KEY: ${{ secrets.TRELLO_KEY }}
+          TRELLO_TOKEN: ${{ secrets.TRELLO_TOKEN }}
+        run: python .github/scripts/trello_sync.py
