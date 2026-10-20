@@ -1,15 +1,22 @@
 """Saves flashcards as CSV (for importing into Anki or Quizlet) and Markdown."""
 
 import csv
+import io
 from pathlib import Path
 
 
-def write_csv(cards, path):
+def to_csv(cards):
     """Two columns, question then answer, with no header row so Anki imports it directly."""
+    out = io.StringIO()
+    writer = csv.writer(out, lineterminator="\n")
+    for card in cards:
+        writer.writerow([card.question, card.answer])
+    return out.getvalue()
+
+
+def write_csv(cards, path):
     with open(path, "w", newline="", encoding="utf-8") as f:
-        writer = csv.writer(f)
-        for card in cards:
-            writer.writerow([card.question, card.answer])
+        f.write(to_csv(cards))
 
 
 def to_markdown(cards, title):
